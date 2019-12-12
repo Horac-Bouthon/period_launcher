@@ -30,7 +30,7 @@ class CronWrapper:
         set_command += ' && '
         set_command += os.path.join(sys.path[0], self.action)
         ret_val = '{} {} {} {}'.format(self.cron_text, cron_wrapper.CRON_USER, set_command,
-                                       '# {}'.format("ID: troy-crawler"))
+                                       '# {}'.format("ID: period-launcher"))
         return ret_val
 
     def install(self):

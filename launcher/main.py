@@ -2,7 +2,6 @@ import logging
 import logger_wrapper
 import argparse
 import os
-import json
 from datetime import datetime
 
 from json_wrapper.json_wrapper import JsonWrapper
@@ -19,7 +18,7 @@ in_args.add_argument('-t', '--crontab', help='List configured cron table', actio
 in_args.add_argument('-v', '--verbose', help='Verbose output', action='store_true')
 in_args.add_argument('-ll', '--log_level', help='Set log level for this run.',
                      choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'])
-in_args.add_argument('-s', '--api_send', help='Send start command.')
+in_args.add_argument('-s', '--api_send', help='Send start command with send date time (yyyy-mm-dd hh:mm:ss)')
 akt_args = in_args.parse_args()
 
 lw = LoggerWrapper()
@@ -33,7 +32,8 @@ else:
     logger = lw.set_logger(logger)
 
 
-def send():
+def send(par_dt_str = None):
+    logger.info("--------- Send starter ----------")
     if akt_args.config:
         str_config = akt_args.config
     else:
@@ -41,12 +41,18 @@ def send():
     ini_obj = IniWrapper(str_config)
     ini_obj.read_data()
     json_obj = JsonWrapper.from_none()
-    now = datetime.now()
-    str_now = now.strftime("%Y-%m-%d %H:%M:%S")
+    if par_dt_str is None:
+        now = datetime.now()
+        str_now = now.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        str_now = par_dt_str
+    logger.info("reference date = {}".format(str_now))
     json_obj.dict = dict()
     json_obj.dict['start'] = str_now
     a_w = ApiWrapper(ini_obj.data['ApiUrl'])
+    logger.info("send to api: {}".format(ini_obj.data['ApiUrl']))
     a_w.post_json(json_obj.get_json())
+    logger.info('--------- END ----------')
     return
 
 
@@ -118,6 +124,8 @@ def main():
         list_cron()
     elif akt_args.uninstall:
         uninstall_cron()
+    elif akt_args.api_send:
+        send(akt_args.api_send)
     else:
         send()
     return

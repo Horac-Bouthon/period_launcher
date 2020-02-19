@@ -41,7 +41,7 @@ class CronWrapper:
         touch(crontab_path)
         cron_string = cron_wrapper.CRON_STRING
         cron_string += self.crontab_get_string()
-        with open(crontab_path, 'w') as f:
+        with open(crontab_path, 'a') as f:
             f.write(cron_string + '\n')
         self.logger.debug('crontab_install done')
 

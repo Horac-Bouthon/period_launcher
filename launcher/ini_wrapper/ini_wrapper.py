@@ -18,7 +18,7 @@ class IniWrapper:
             self.config.read(self.file_name)
         else:
             self.config = None
-        self.logger.info('Create: {}'.format(repr(self)))
+        self.logger.debug('Create: {}'.format(repr(self)))
 
     def read_data(self):
         """ Modify to load data for specific application """
@@ -41,7 +41,15 @@ class IniWrapper:
         else:
             self.data['CronCommand'] = 'python3 main.py'
 
-        self.logger.info('Set data: {}'.format(self.data))
+        if self.config and \
+                ('MAIN' in self.config) and \
+                ('CronId' in self.config['MAIN']):
+            set_value = self.config['MAIN']['CronId'].replace('"', '')
+            self.data['CronId'] = set_value
+        else:
+            self.data['CronId'] = 'periodic-launcher'
+
+        self.logger.debug('Set data: {}'.format(self.data))
 
     def __repr__(self):
         return "IniWrapper('{}')"\
